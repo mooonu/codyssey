@@ -1,7 +1,9 @@
 # -- file --
 basic_prompt.md
 explain.md
+CLAUDE.md
 
 # -- folder --
 .venv/
 Assets/
+.claude/

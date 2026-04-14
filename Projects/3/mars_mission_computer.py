@@ -1,4 +1,5 @@
-import random  # 난수 생성을 위한 표준 라이브러리
+import random   # 난수 생성을 위한 표준 라이브러리
+import datetime  # 현재 날짜/시간 기록을 위한 표준 라이브러리
 
 
 class DummySensor:
@@ -27,8 +28,46 @@ class DummySensor:
         self.env_values['mars_base_internal_co2'] = round(random.uniform(0.02, 0.1), 2)        # 0.02~0.1%, 소수 2자리
         self.env_values['mars_base_internal_oxygen'] = round(random.uniform(4, 7), 2)          # 4~7%, 소수 2자리
 
+    def log_env(self):
+        # 현재 env_values와 타임스탬프를 sensor_log.csv 파일에 한 줄 추가
+        # 파일이 없으면 헤더를 먼저 작성한 뒤 데이터 행을 추가
+        log_file = 'sensor_log.csv'
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        v = self.env_values
+
+        headers = [
+            'date_time',
+            'mars_base_internal_temperature',
+            'mars_base_external_temperature',
+            'mars_base_internal_humidity',
+            'mars_base_external_illuminance',
+            'mars_base_internal_co2',
+            'mars_base_internal_oxygen',
+        ]
+        row = [
+            now,
+            v['mars_base_internal_temperature'],
+            v['mars_base_external_temperature'],
+            v['mars_base_internal_humidity'],
+            v['mars_base_external_illuminance'],
+            v['mars_base_internal_co2'],
+            v['mars_base_internal_oxygen'],
+        ]
+
+        try:
+            with open(log_file, 'r') as f:
+                has_header = f.readline().strip() != ''
+        except FileNotFoundError:
+            has_header = False
+
+        with open(log_file, 'a') as f:
+            if not has_header:
+                f.write(','.join(headers) + '\n')
+            f.write(','.join(str(val) for val in row) + '\n')
+
     def get_env(self):
-        # 현재 env_values 딕셔너리를 그대로 반환
+        # 현재 env_values 딕셔너리를 반환하고 로그 파일에 기록
+        self.log_env()
         return self.env_values
 
 
